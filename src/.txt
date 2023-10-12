@@ -1,0 +1,167 @@
+import React, { useState, useEffect } from "react";
+import Axios from "axios";
+import "./App.css";
+
+const App: React.FC = () => {
+  // const [data, setData] = useState("");
+
+  // const getData = async () => {
+  //   const response = await Axios.get("http://localhost:4000/");
+  //   setData(response.data);
+  // };
+
+  const [formData, setFormData] = useState({
+    campaignName: "",
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+    spend: 0,
+  });
+
+  const [metrics, setMetrics] = useState({
+    ctr: 0,
+    cr: 0,
+    cpc: 0,
+    costPerConversion: 0,
+  });
+
+  const [error, setError] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: name === "campaignName" ? value : parseFloat(value),
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:4000/metrics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        alert("Campaign data saved successfully");
+      } else {
+        const data = await response.json();
+        setError(data.error);
+      }
+    } catch (error) {
+      setError("Failed to save campaign data");
+    }
+  };
+
+  const handleRetrieve = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:4000/metrics/:campaignName"
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const { impressions, clicks, conversions, spend } = data[0];
+
+        const ctr = ((clicks / impressions) * 100).toFixed(2);
+        const cr = ((conversions / clicks) * 100).toFixed(2);
+        const cpc = (spend / clicks).toFixed(2);
+        const costPerConversion = (spend / conversions).toFixed(2);
+
+        // setMetrics({ ctr, cr, cpc, costPerConversion });
+        setError(null);
+      } else {
+        const data = await response.json();
+        setError(data.error);
+      }
+    } catch (error) {
+      setError("Failed to retrieve campaign data");
+    }
+  };
+
+  useEffect(() => {
+    handleRetrieve();
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Marketing Metrics</h1>
+      <div className="form-container">
+        <form onSubmit={handleSubmit}>
+          <div className="input-group">
+            <label htmlFor="campaignName">Campaign Name</label>
+            <input
+              type="text"
+              id="campaignName"
+              name="campaignName"
+              value={formData.campaignName}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="impressions">Impressions</label>
+            <input
+              type="number"
+              id="impressions"
+              name="impressions"
+              value={formData.impressions}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="clicks">Clicks</label>
+            <input
+              type="number"
+              id="clicks"
+              name="clicks"
+              value={formData.clicks}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="conversions">Conversions</label>
+            <input
+              type="number"
+              id="conversions"
+              name="conversions"
+              value={formData.conversions}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="spend">Spend</label>
+            <input
+              type="number"
+              step="0.01"
+              id="spend"
+              name="spend"
+              value={formData.spend}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+      {error && <div className="error">{error}</div>}
+      <div className="results">
+        <h2>Calculated Metrics</h2>
+        <p>Click Through Rate (CTR): {metrics.ctr}%</p>
+        <p>Conversion Rate (CR): {metrics.cr}%</p>
+        <p>Cost Per Click (CPC): ${metrics.cpc}</p>
+        <p>Cost Per Conversion: ${metrics.costPerConversion}</p>
+        <button onClick={handleRetrieve}>Retrieve & Calculate</button>
+      </div>
+    </div>
+  );
+};
+
+export default App;
