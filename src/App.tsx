@@ -6,6 +6,8 @@ import { CampaignData } from "./components/CampaignForm";
 import axios from "axios";
 import "./App.css";
 
+// axios.defaults.withCredentials = true;
+
 function App() {
   const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
   const [ctr, setCTR] = useState(0);
@@ -18,8 +20,10 @@ function App() {
     setCampaignData(data);
     console.log("Data", data);
     try {
-      const response = await axios.post("/metrics", data);
-      // const response = await axios.post("http://localhost:4000/metrics", data);
+      const response = await axios.post(
+        "https://markettig-metrics.onrender.com/metrics",
+        data
+      );
       console.log("response", response);
       return response;
     } catch (error) {
@@ -30,8 +34,7 @@ function App() {
   const handleRetrieve = () => {
     let campaignName = campaignData?.campaignName;
     axios
-      .get(`/metrics/${campaignName}`)
-      // .get(`http://localhost:4000/metrics/${campaignName}`)
+      .get(`https://markettig-metrics.onrender.com/metrics/${campaignName}`)
       .then((data) => {
         console.log(data);
         calculateMetrics(data.data.metrics);
