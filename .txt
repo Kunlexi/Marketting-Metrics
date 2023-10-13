@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 interface CampaignFormProps {
-  submitData: (data: CampaignData) => void;
+  onSubmit: (data: CampaignData) => void;
   onRetrieve: () => void;
 }
 
@@ -14,7 +14,7 @@ export interface CampaignData {
 }
 
 const CampaignForm: React.FC<CampaignFormProps> = ({
-  submitData,
+  onSubmit,
   onRetrieve,
 }) => {
   const [formData, setFormData] = useState<CampaignData>({
@@ -32,8 +32,7 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    submitData(formData);
+    onSubmit(formData);
   };
 
   return (
@@ -88,8 +87,8 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
         <div className="button-group">
           <button>Submit</button>
         </div>
+        <button onClick={onRetrieve}>Retrieve & Calculate</button>
       </form>
-      <button onClick={onRetrieve}>Retrieve & Calculate</button>
     </div>
   );
 };

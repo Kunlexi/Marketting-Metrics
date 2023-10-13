@@ -1,12 +1,9 @@
-// src/App.tsx
 import React, { useState } from "react";
 import CampaignForm from "./components/CampaignForm";
 import MetricsDisplay from "./components/MetricsDisplay";
 import { CampaignData } from "./components/CampaignForm";
 import axios from "axios";
 import "./App.css";
-
-// axios.defaults.withCredentials = true;
 
 function App() {
   const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
@@ -17,6 +14,26 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (data: CampaignData) => {
+    if (!data.campaignName) {
+      console.log(data);
+      setError("Campaign name cannot be empty.");
+      return;
+    } else if (data.clicks < 1) {
+      setError("Clicks should be grather than 1");
+      return;
+    } else if (data.conversions < 1) {
+      setError("Conversion must be greather than 1");
+      return;
+    } else if (data.impressions < 1) {
+      setError("impression must be greater than 1");
+      return;
+    } else if (data.spend < 1) {
+      setError("You cannot spend less than 1");
+      return;
+    }
+
+    setError("");
+
     setCampaignData(data);
     console.log("Data", data);
     try {
@@ -40,7 +57,7 @@ function App() {
         calculateMetrics(data.data.metrics);
       })
       .catch((error) => {
-        setError("Error storing data on the server.");
+        setError("Error retrieving data from the server.");
       });
   };
 
@@ -54,7 +71,11 @@ function App() {
   return (
     <div className="App">
       <h1>Marketing Metrics Storage & Retrieval</h1>
-      <CampaignForm onSubmit={handleSubmit} onRetrieve={handleRetrieve} />
+      <CampaignForm submitData={handleSubmit} onRetrieve={handleRetrieve} />
+      <div>
+        <p className="error">{error}</p>
+      </div>
+
       {campaignData && (
         <MetricsDisplay
           data={campaignData}
@@ -62,7 +83,7 @@ function App() {
           cr={cr}
           cpc={cpc}
           cpa={cpa}
-          error={error}
+          error=""
         />
       )}
     </div>
