@@ -68,6 +68,12 @@ button:hover {
   margin-top: 10px;
 }
 
+.success {
+  color: #008000;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
 .results {
   max-width: 400px;
   margin: 20px auto;
@@ -83,68 +89,3 @@ p {
   font-size: 16px;
   margin: 10px 0;
 }
-
-/* App.css */
-/* App.css */
-
-/* Global styles */
-/* App.css */
-/* body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-h2 {
-  font-size: 24px;
-  margin-top: 0;
-}
-
-.campaign-form {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.campaign-form input {
-  flex: 1;
-  padding: 10px;
-  margin: 5px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  outline: none;
-}
-
-.campaign-form button {
-  flex-basis: 100%;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  margin: 10px 0;
-  border-radius: 3px;
-}
-
-.campaign-form button:hover {
-  background-color: #0056b3;
-}
-
-.metrics-display {
-  margin-top: 20px;
-  border-top: 1px solid #ccc;
-  padding-top: 20px;
-}
-
-.error {
-  color: red;
-} */

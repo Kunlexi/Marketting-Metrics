@@ -3,6 +3,10 @@ import React, { useState } from "react";
 interface CampaignFormProps {
   submitData: (data: CampaignData) => void;
   onRetrieve: () => void;
+  error: string | null;
+  successMessage: string | null;
+  setSuccessMessage: (message: string | null) => void;
+  clearSuccessMessage: () => void;
 }
 
 export interface CampaignData {
@@ -16,6 +20,9 @@ export interface CampaignData {
 const CampaignForm: React.FC<CampaignFormProps> = ({
   submitData,
   onRetrieve,
+  error,
+  successMessage,
+  clearSuccessMessage,
 }) => {
   const [formData, setFormData] = useState<CampaignData>({
     campaignName: "",
@@ -30,10 +37,28 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    submitData(formData);
+    try {
+      const response = await submitData(formData);
+
+      setFormData({
+        campaignName: "",
+        impressions: 0,
+        clicks: 0,
+        conversions: 0,
+        spend: 0,
+      });
+
+      setSuccessMessage("Data submitted successfully");
+
+      setError(null);
+
+      clearSuccessMessage();
+    } catch (error) {
+      setError((error as any)?.response?.data?.error || "Data not submitted");
+    }
   };
 
   return (
@@ -95,3 +120,8 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
 };
 
 export default CampaignForm;
+
+function setError(arg0: string | null) {}
+function setSuccessMessage(arg0: string) {
+  return;
+}

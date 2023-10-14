@@ -12,39 +12,59 @@ function App() {
   const [cpc, setCPC] = useState(0);
   const [cpa, setCPA] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const clearSuccessMessage = () => {
+    setSuccessMessage(null);
+  };
 
   const handleSubmit = async (data: CampaignData) => {
     if (!data.campaignName) {
-      console.log(data);
       setError("Campaign name cannot be empty.");
+      setSuccessMessage(null);
       return;
     } else if (data.clicks < 1) {
-      setError("Clicks should be grather than 1");
+      setError("Clicks should be greater than 1");
+      setSuccessMessage(null);
       return;
     } else if (data.conversions < 1) {
-      setError("Conversion must be greather than 1");
+      setError("Conversion must be greater than 1");
+      setSuccessMessage(null);
       return;
     } else if (data.impressions < 1) {
-      setError("impression must be greater than 1");
+      setError("Impression must be greater than 1");
+      setSuccessMessage(null);
       return;
     } else if (data.spend < 1) {
       setError("You cannot spend less than 1");
+      setSuccessMessage(null);
       return;
     }
 
     setError("");
+    setSuccessMessage("Campaign Data submitted successfully");
+    // setSuccessMessage("");
+
+    setCTR(0);
+    setCR(0);
+    setCPC(0);
+    setCPA(0);
 
     setCampaignData(data);
     console.log("Data", data);
+
     try {
       const response = await axios.post(
         "https://markettig-metrics.onrender.com/metrics",
         data
       );
-      console.log("response", response);
-      return response;
-    } catch (error) {
-      console.log("Data not submitted");
+      const metrics = response.data;
+      setCTR(metrics.ctr);
+      setCR(metrics.cr);
+      setCPC(metrics.cpc);
+      setCPA(metrics.cpa);
+    } catch (error: any) {
+      setError(error.response?.data?.message || "An error occurred");
     }
   };
 
@@ -54,10 +74,20 @@ function App() {
       .get(`https://markettig-metrics.onrender.com/metrics/${campaignName}`)
       .then((data) => {
         console.log(data);
+        const successMessage = `Campaign data retrieved successfully`;
+        setError(null);
+        setSuccessMessage(successMessage);
         calculateMetrics(data.data.metrics);
       })
       .catch((error) => {
-        setError("Error retrieving data from the server.");
+        if (error.response && error.response.status === 400) {
+          setError("");
+          const errorMessage = `Campaign Name '${campaignName}' already added.`;
+          setSuccessMessage(errorMessage);
+        } else {
+          setError("Error retrieving data from the server.");
+          setSuccessMessage(null);
+        }
       });
   };
 
@@ -71,9 +101,19 @@ function App() {
   return (
     <div className="App">
       <h1>Marketing Metrics Storage & Retrieval</h1>
-      <CampaignForm submitData={handleSubmit} onRetrieve={handleRetrieve} />
+      <CampaignForm
+        submitData={handleSubmit}
+        onRetrieve={handleRetrieve}
+        error={error}
+        successMessage={successMessage}
+        setSuccessMessage={setSuccessMessage}
+        clearSuccessMessage={clearSuccessMessage}
+      />
+
+      <div>{error && <div className="error">{error}</div>}</div>
+
       <div>
-        <p className="error">{error}</p>
+        <p className="success">{successMessage}</p>
       </div>
 
       {campaignData && (
