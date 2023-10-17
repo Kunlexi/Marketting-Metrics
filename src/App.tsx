@@ -108,6 +108,7 @@ function App() {
         successMessage={successMessage}
         setSuccessMessage={setSuccessMessage}
         clearSuccessMessage={clearSuccessMessage}
+        setError={() => {}}
       />
 
       <div>{error && <div className="error">{error}</div>}</div>

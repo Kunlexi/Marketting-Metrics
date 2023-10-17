@@ -4,6 +4,7 @@ interface CampaignFormProps {
   submitData: (data: CampaignData) => void;
   onRetrieve: () => void;
   error: string | null;
+  setError: (error: string | null) => void; // Fix for problem 1
   successMessage: string | null;
   setSuccessMessage: (message: string | null) => void;
   clearSuccessMessage: () => void;
@@ -20,8 +21,8 @@ export interface CampaignData {
 const CampaignForm: React.FC<CampaignFormProps> = ({
   submitData,
   onRetrieve,
-  error,
-  successMessage,
+  setError,
+  setSuccessMessage,
   clearSuccessMessage,
 }) => {
   const [formData, setFormData] = useState<CampaignData>({
@@ -41,7 +42,7 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
     e.preventDefault();
 
     try {
-      const response = await submitData(formData);
+      await submitData(formData);
 
       setFormData({
         campaignName: "",
@@ -51,10 +52,8 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
         spend: 0,
       });
 
-      setSuccessMessage("Data submitted successfully");
-
       setError(null);
-
+      setSuccessMessage("Data submitted successfully");
       clearSuccessMessage();
     } catch (error) {
       setError((error as any)?.response?.data?.error || "Data not submitted");
@@ -120,8 +119,3 @@ const CampaignForm: React.FC<CampaignFormProps> = ({
 };
 
 export default CampaignForm;
-
-function setError(arg0: string | null) {}
-function setSuccessMessage(arg0: string) {
-  return;
-}
